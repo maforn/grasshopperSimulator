@@ -7,6 +7,10 @@ from settings import Settings
 
 
 class Simulation:
+    """
+    Simulation object exposing methods to control the simulation.
+    The drawing on a pygame screen is done internally.
+    """
     def __init__(self, window_width, window_height, grid):
         self.grid = grid
         # Pygame setup
