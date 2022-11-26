@@ -8,14 +8,10 @@ class Tile:
         self.x_coordinate_in_grid = x_coordinate_in_grid
         self.y_coordinate_in_grid = y_coordinate_in_grid
 
-        self.grasshoppers = 0
         self.pheromone = 0
         self.temperature = gauss_to_color(128, 64)
         self.resources = gauss_to_color(128, 64)
         self.humidity = gauss_to_color(128, 64)  
-
-    def _update_grasshoppers(self):
-        pass
 
     def _update_pheromone(self):
         pass
@@ -37,7 +33,6 @@ class Tile:
             self.humidity += randint(-h_change, h_change)
     
     def update(self):
-        self._update_grasshoppers()
         self._update_pheromone()
         self._update_temperature()
         self._update_resources()
@@ -47,9 +42,12 @@ class Tile:
 class Grid:
     def __init__(self, x_number_of_tiles, y_number_of_tiles):
         """
-        Initialises a Grid object with random values for humidity and other
-        parameters in each tile.
+        Initialises a Grid object with random values for humidity and 
+        other parameters in each tile.
         x and y are the number of tiles in the grid in width and height.
+        The class is designed to be independent from the graphical 
+        details (screen size etc.) and only represents the grid as an
+        abstract entity.
         """
         self.x_number_of_tiles = x_number_of_tiles
         self.y_number_of_tiles = y_number_of_tiles
@@ -59,6 +57,11 @@ class Grid:
             for y in range(y_number_of_tiles):
                 column.append(Tile(x, y))
             self.table.append(column) 
+        # This attribute will keep track of the position of each
+        # individual grasshopper in the grid.
+        # This is probably going to be a dictionary with the grid's 
+        # tiles as keys. 
+        self.grasshoppers = dict()
     
     def __getitem__(self, key):
         """
@@ -86,9 +89,18 @@ class Grid:
             raise StopIteration
         return tile
 
+    def _move_grasshoppers(self):
+        """
+        This method is called after the grid is updated to change the
+        position of grasshoppers in the grid based on humidity, 
+        pheromons etc.
+        """
+        pass
+
     def update(self):
         """
         Updates the status of all the tiles in the grid
         """
         for tile in self:
             tile.update()
+        self._move_grasshoppers()
