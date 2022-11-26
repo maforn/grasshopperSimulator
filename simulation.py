@@ -2,7 +2,7 @@ import itertools
 
 import pygame
 
-from color import Color
+import color
 from settings import Settings
 
 
@@ -14,7 +14,7 @@ class Simulation:
         self.clock = pygame.time.Clock()
         self.pygame_screen = pygame.display.set_mode((window_width,
                                                       window_height))
-        self.pygame_screen.fill(Color.BLACK)
+        self.pygame_screen.fill(color.BLACK)
         self._draw_grid()
         pygame.display.update()
     
@@ -27,7 +27,7 @@ class Simulation:
             pygame.draw.rect(self.pygame_screen, (0, 0, tile.humidity),
                              rect, 0)
             # Border
-            pygame.draw.rect(self.pygame_screen, Color.BLACK,
+            pygame.draw.rect(self.pygame_screen, color.BLACK,
                              rect, 1)
     
     def tick(self):
