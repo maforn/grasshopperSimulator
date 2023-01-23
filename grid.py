@@ -10,9 +10,9 @@ class Tile:
 
         self.pheromone = 0
         self.grasshoppers = max(randint(-2, 2), 0)
-        self.temperature = gauss_to_color(128, 64)
+        self.temperature = gauss_to_color(192, 64)
         self.resources = gauss_to_color(192, 64)
-        self.humidity = gauss_to_color(128, 64)  
+        self.humidity = gauss_to_color(192, 64)
 
     def _update_pheromone(self):
         pass
