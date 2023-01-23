@@ -7,7 +7,7 @@ from time import sleep
 from util import check_user_exit
 
 def main():
-    grid = Grid(Settings.WINDOW_WIDTH, Settings.WINDOW_HEIGHT)
+    grid = Grid(Settings.WINDOW_WIDTH // 2, Settings.WINDOW_HEIGHT // 2)
     simulation = Simulation(Settings.WINDOW_WIDTH * Settings.BLOCKSIZE,
                             Settings.WINDOW_HEIGHT * Settings.BLOCKSIZE,
                             grid)

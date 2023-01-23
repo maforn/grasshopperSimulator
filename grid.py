@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, seed
 from settings import SimulationParameters
 from util import gauss_to_color
 
@@ -9,17 +9,27 @@ class Tile:
         self.y_coordinate_in_grid = y_coordinate_in_grid
 
         self.pheromone = 0
+        self.grasshoppers = max(randint(-2, 2), 0)
         self.temperature = gauss_to_color(128, 64)
-        self.resources = gauss_to_color(128, 64)
+        self.resources = gauss_to_color(192, 64)
         self.humidity = gauss_to_color(128, 64)  
 
     def _update_pheromone(self):
         pass
 
     def _update_temperature(self):
+        t = self.temperature
+        t_change = SimulationParameters.TEMPERATURE_CHANGE
+        if t < t_change:
+            self.temperature += t_change
+        elif t > 255 - t_change:
+            self.temperature -= t_change
+        else:
+            self.temperature += randint(-t_change, t_change)
         pass
 
     def _update_resources(self):
+        self.resources = max(0, self.resources - self.grasshoppers / 10);
         pass
 
     def _update_humidity(self):
@@ -45,7 +55,7 @@ class Grid:
         Initialises a Grid object with random values for humidity and 
         other parameters in each tile.
         x and y are the number of tiles in the grid in width and height.
-        The class is designed to be independent from the graphical 
+        The class is designed to be independent of the graphical
         details (screen size etc.) and only represents the grid as an
         abstract entity.
         """
@@ -62,6 +72,9 @@ class Grid:
         # This is probably going to be a dictionary with the grid's 
         # tiles as keys. 
         self.grasshoppers = dict()
+
+        # set the seed for random so that the result can always be compared
+        seed(0)
     
     def __getitem__(self, key):
         """
@@ -93,7 +106,7 @@ class Grid:
         """
         This method is called after the grid is updated to change the
         position of grasshoppers in the grid based on humidity, 
-        pheromons etc.
+        pheromones etc.
         """
         pass
 
