@@ -1,4 +1,4 @@
-from random import randint, seed
+from random import randint, seed, random
 from settings import SimulationParameters
 from util import gauss_to_color
 
@@ -8,13 +8,19 @@ class Tile:
         self.x_coordinate_in_grid = x_coordinate_in_grid
         self.y_coordinate_in_grid = y_coordinate_in_grid
 
-        self.pheromone = 0
+        self.pheromone = 0.0
         self.grasshoppers = max(randint(-2, 2), 0)
         self.temperature = gauss_to_color(192, 64)
-        self.resources = gauss_to_color(192, 64)
+        self.resources = float(gauss_to_color(192, 64))
         self.humidity = gauss_to_color(192, 64)
 
     def _update_pheromone(self):
+        if self.grasshoppers > 0 and self.temperature > 128 and self.resources > 128 and self.humidity > 128:
+            if self.pheromone < 1.0:
+                self.pheromone += 0.01
+        else:
+            if self.pheromone > 0.0:
+                self.pheromone -= 0.01
         pass
 
     def _update_temperature(self):
@@ -29,7 +35,7 @@ class Tile:
         pass
 
     def _update_resources(self):
-        self.resources = max(0, self.resources - self.grasshoppers / 10);
+        self.resources = max(0.0, self.resources - self.grasshoppers / 100)
         pass
 
     def _update_humidity(self):
@@ -43,10 +49,10 @@ class Tile:
             self.humidity += randint(-h_change, h_change)
     
     def update(self):
-        self._update_pheromone()
         self._update_temperature()
         self._update_resources()
         self._update_humidity()
+        self._update_pheromone()
 
 
 class Grid:
@@ -66,12 +72,7 @@ class Grid:
             column = []
             for y in range(y_number_of_tiles):
                 column.append(Tile(x, y))
-            self.table.append(column) 
-        # This attribute will keep track of the position of each
-        # individual grasshopper in the grid.
-        # This is probably going to be a dictionary with the grid's 
-        # tiles as keys. 
-        self.grasshoppers = dict()
+            self.table.append(column)
 
         # set the seed for random so that the result can always be compared
         seed(0)
@@ -108,7 +109,31 @@ class Grid:
         position of grasshoppers in the grid based on humidity, 
         pheromones etc.
         """
-        pass
+        for tile in self:
+            if tile.grasshoppers > 0 and tile.pheromone == 0.0:
+                x_min_right = 2
+                x_min_left = -1
+                y_min_top = -1
+                y_min_bot = 2
+                if tile.x_coordinate_in_grid == 0:
+                    x_min_left = 0
+                if tile.x_coordinate_in_grid == self.x_number_of_tiles - 1:
+                    x_min_right = 1
+                if tile.y_coordinate_in_grid == 0:
+                    y_min_top = 0
+                if tile.y_coordinate_in_grid == self.y_number_of_tiles - 1:
+                    y_min_bot = 1
+                preferred = (0, 0)
+                max_ph = 0.0
+                for x in range(x_min_left, x_min_right):
+                    for y in range(y_min_top, y_min_bot):
+                        tile_xy = (tile.x_coordinate_in_grid + x, tile.y_coordinate_in_grid + y)
+                        if self.__getitem__(tile_xy).pheromone > max_ph:
+                            max_ph = self.__getitem__(tile_xy).pheromone
+                            preferred = tile_xy
+                if preferred != (0, 0) and max_ph != 0.0 and max_ph > random():
+                    self.__getitem__(preferred).grasshoppers += tile.grasshoppers
+                    tile.grasshoppers = 0
 
     def update(self):
         """

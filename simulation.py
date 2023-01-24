@@ -45,10 +45,11 @@ class Simulation:
                              rect_h, 0)
             pygame.draw.rect(self.pygame_screen, (tile.temperature, 0, 0),
                              rect_t, 0)
-            pygame.draw.rect(self.pygame_screen, (0, tile.resources, 0),
+            pygame.draw.rect(self.pygame_screen, (0, int(tile.resources), 0),
                              rect_r, 0)
+            i_pheromone = min(128, int(tile.pheromone * 128))
             pygame.draw.rect(self.pygame_screen,
-                             (127 + tile.pheromone * 128, 127 + tile.pheromone, 127 + tile.pheromone),
+                             (127 + i_pheromone, 127 + i_pheromone, 127 + i_pheromone),
                              rect_p, 0)
             # draw also the number of grasshoppers
             widget = font.render(str(tile.grasshoppers), True, pygame.Color("black"))
