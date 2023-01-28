@@ -17,10 +17,12 @@ class Tile:
     def _update_pheromone(self):
         if self.grasshoppers > 0 and self.temperature > 128 and self.resources > 128 and self.humidity > 128:
             if self.pheromone < 1.0:
-                self.pheromone += 0.01
+                self.pheromone += 0.1
         else:
-            if self.pheromone > 0.0:
-                self.pheromone -= 0.01
+            if self.pheromone > 0.1:
+                self.pheromone -= 0.1
+            elif self.pheromone <= 0.1:
+                self.pheromone = 0
         pass
 
     def _update_temperature(self):
@@ -131,7 +133,12 @@ class Grid:
                         if self.__getitem__(tile_xy).pheromone > max_ph:
                             max_ph = self.__getitem__(tile_xy).pheromone
                             preferred = tile_xy
-                if preferred != (0, 0) and max_ph != 0.0 and max_ph > random():
+                if max_ph == 0.0:
+                    preferred = (tile.x_coordinate_in_grid + randint(x_min_left, x_min_right - 1),
+                                 tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot - 1))
+                    self.__getitem__(preferred).grasshoppers += 1
+                    tile.grasshoppers -= 1
+                elif preferred != (0, 0) and max_ph > random():
                     self.__getitem__(preferred).grasshoppers += tile.grasshoppers
                     tile.grasshoppers = 0
 
