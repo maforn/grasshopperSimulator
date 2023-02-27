@@ -25,7 +25,7 @@ class Simulation:
 
     def _draw_grid(self):
         bs = Settings.BLOCKSIZE
-        font = pygame.font.SysFont(pygame.font.get_fonts()[0], bs)
+        font = pygame.font.SysFont(pygame.font.get_fonts()[0], bs // 2)
         for tile in self.grid:
             # humidity rect
             rect_h = pygame.Rect(tile.x_coordinate_in_grid * bs,
@@ -52,7 +52,7 @@ class Simulation:
                              (127 + i_pheromone, 127 + i_pheromone, 127 + i_pheromone),
                              rect_p, 0)
             # draw also the number of grasshoppers
-            widget = font.render(str(tile.grasshoppers), True, pygame.Color("black"))
+            widget = font.render(str(tile.grasshoppers_p) + '|' + str(tile.grasshoppers_NOT_p), True, pygame.Color("black"))
             font_rect = widget.get_rect()
             font_rect.center = rect_p.center
             self.pygame_screen.blit(widget, font_rect)
