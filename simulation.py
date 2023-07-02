@@ -71,6 +71,14 @@ class Simulation:
         """
         Moves the simulation one step forward.
         """
-        self.grid.update()
+        grasshoppers = self.grid.update()
         self._draw_grid()
         pygame.display.update()
+        return grasshoppers
+
+    def save_image(self, i):
+        """
+        Saves the pygame window as an image
+        :param i: number of the image
+        """
+        pygame.image.save(self.pygame_screen, f'images/screenshot{i}.png')

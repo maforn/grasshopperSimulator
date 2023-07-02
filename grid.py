@@ -1,4 +1,7 @@
 from random import randint, seed, random
+
+import pygame.image
+
 from settings import SimulationParameters
 from util import gauss_to_color
 from math import ceil
@@ -37,8 +40,8 @@ class Tile:
             self.temperature += randint(-t_change, t_change)
 
     def _update_resources(self):
-        self.resources = max(0, self.resources - ceil((self.grasshoppers_p + self.grasshoppers_NOT_p) / 3))
-        if random() > 3/4 and self.humidity > 128 and self.temperature > 128:
+        self.resources = max(0, self.resources - ceil((self.grasshoppers_p + self.grasshoppers_NOT_p) / 5))
+        if random() > 2/3:
             self.resources = min(255, self.resources + 1)
 
     def _update_humidity(self):
@@ -179,5 +182,5 @@ class Grid:
                 tile.update()
                 tot_grasshoppers_p += tile.grasshoppers_p
                 tot_grasshoppers_NOT_p += tile.grasshoppers_NOT_p
-        print(tot_grasshoppers_p, tot_grasshoppers_NOT_p)
         self._move_grasshoppers()
+        return f'{tot_grasshoppers_p};{tot_grasshoppers_NOT_p}'

@@ -8,6 +8,9 @@ class Settings:
 
     SECONDS_BETWEEN_UPDATES = 1
 
+    SAVE_IMAGES = True
+    SAVE_DATA = True
+
 class SimulationParameters:
     """
     Settings potentially impacting on the simulation's results
