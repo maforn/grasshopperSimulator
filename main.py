@@ -13,8 +13,9 @@ def main():
                             grid)
     f = open("data.csv", "w")
     i = 0
+    grasshoppers = "1;1"
     try:
-        while True:
+        while grasshoppers != "0;0":
             if Settings.SAVE_IMAGES:
                 simulation.save_image(i)
                 i += 1

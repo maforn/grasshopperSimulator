@@ -6,7 +6,7 @@ class Settings:
     WINDOW_WIDTH = 20
     BLOCKSIZE = 40
 
-    SECONDS_BETWEEN_UPDATES = 1
+    SECONDS_BETWEEN_UPDATES = 0.1
 
     SAVE_IMAGES = True
     SAVE_DATA = True
