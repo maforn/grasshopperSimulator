@@ -5,6 +5,7 @@ from settings import Settings
 from simulation import Simulation
 from time import sleep
 from util import check_user_exit
+import os
 
 def main():
     grid = Grid(Settings.WINDOW_WIDTH // 2, Settings.WINDOW_HEIGHT // 2)
@@ -14,6 +15,8 @@ def main():
     f = open("data.csv", "w")
     i = 0
     grasshoppers = "1;1"
+    if not os.path.exists("images") and Settings.SAVE_IMAGES:
+        os.mkdir("images")
     try:
         while grasshoppers != "0;0":
             if Settings.SAVE_IMAGES:
