@@ -145,10 +145,10 @@ class Grid:
                                 max_ph = self.__getitem__(tile_xy).pheromone
                                 preferred = tile_xy
 
-                    if randint(64, 129) >= (
+                    if randint(64, 193) >= (
                             (tile.temperature + tile.resources + tile.humidity) // 3 + 5 * (tile.grasshoppers_p + tile.grasshoppers_NOT_p)) and tile.grasshoppers_p > 0:
                         tile.grasshoppers_p -= 1
-                    if randint(64, 129) >= (
+                    if randint(64, 193) >= (
                             (tile.temperature + tile.resources + tile.humidity) // 3 + 5 * (tile.grasshoppers_p + tile.grasshoppers_NOT_p)) and tile.grasshoppers_NOT_p > 0:
                         tile.grasshoppers_NOT_p -= 1
 
