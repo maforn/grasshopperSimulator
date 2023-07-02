@@ -10,10 +10,10 @@ class Tile:
         self.y_coordinate_in_grid = y_coordinate_in_grid
 
         self.pheromone = 0.0
-        self.grasshoppers_p = max(randint(-2, 2), 0)
-        self.grasshoppers_NOT_p = max(randint(-2, 2), 0)
+        self.grasshoppers_p = abs(randint(-2, 2))
+        self.grasshoppers_NOT_p = abs(randint(-2, 2))
         self.temperature = gauss_to_color(192, 64)
-        self.resources = float(gauss_to_color(192, 64))
+        self.resources = gauss_to_color(192, 64)
         self.humidity = gauss_to_color(192, 64)
 
     def _update_pheromone(self):
@@ -37,7 +37,9 @@ class Tile:
             self.temperature += randint(-t_change, t_change)
 
     def _update_resources(self):
-        self.resources = max(0.0, self.resources - ceil((self.grasshoppers_p + self.grasshoppers_NOT_p) // 5))
+        self.resources = max(0, self.resources - ceil((self.grasshoppers_p + self.grasshoppers_NOT_p) / 3))
+        if random() > 3/4 and self.humidity > 128 and self.temperature > 128:
+            self.resources = min(255, self.resources + 1)
 
     def _update_humidity(self):
         h = self.humidity
@@ -110,57 +112,60 @@ class Grid:
         position of grasshoppers in the grid based on humidity, 
         pheromones etc.
         """
-        for tile in self:
-            if (tile.grasshoppers_p > 0 or tile.grasshoppers_NOT_p > 0) and not (
-                    tile.temperature > 128 and tile.resources > 128 and tile.humidity > 128):
-                # calc the boundaries of the "square" in which the grasshoppers can move
-                x_min_right = 2
-                x_min_left = -1
-                y_min_top = -1
-                y_min_bot = 2
-                if tile.x_coordinate_in_grid == 0:
-                    x_min_left = 0
-                if tile.x_coordinate_in_grid == self.x_number_of_tiles - 1:
+        for x in range(self.x_number_of_tiles):
+            for y in range(self.y_number_of_tiles):
+                tile = self.__getitem__((x, y))
+                if (tile.grasshoppers_p > 0 or tile.grasshoppers_NOT_p > 0) and not (
+                        tile.temperature > 128 and tile.resources > 128 and tile.humidity > 128):
+                    # calc the boundaries of the "square" in which the grasshoppers can move
                     x_min_right = 1
-                if tile.y_coordinate_in_grid == 0:
-                    y_min_top = 0
-                if tile.y_coordinate_in_grid == self.y_number_of_tiles - 1:
+                    x_min_left = -1
+                    y_min_top = -1
                     y_min_bot = 1
+                    if tile.x_coordinate_in_grid == 0:
+                        x_min_left = 0
+                    if tile.x_coordinate_in_grid == self.x_number_of_tiles - 1:
+                        x_min_right = 0
+                    if tile.y_coordinate_in_grid == 0:
+                        y_min_top = 0
+                    if tile.y_coordinate_in_grid == self.y_number_of_tiles - 1:
+                        y_min_bot = 0
 
-                preferred = (-1, -1)
-                max_ph = 0.0
-                for x in range(x_min_left, x_min_right):
-                    for y in range(y_min_top, y_min_bot):
-                        tile_xy = (tile.x_coordinate_in_grid + x, tile.y_coordinate_in_grid + y)
-                        # avoid auto selecting with the and
-                        if self.__getitem__(tile_xy).pheromone > max_ph and tile_xy != (
-                                tile.x_coordinate_in_grid, tile.y_coordinate_in_grid):
-                            max_ph = self.__getitem__(tile_xy).pheromone
-                            preferred = tile_xy
+                    preferred = (-1, -1)
+                    max_ph = 0.0
+                    for x in range(x_min_left, x_min_right + 1):
+                        for y in range(y_min_top, y_min_bot + 1):
+                            tile_xy = (tile.x_coordinate_in_grid + x, tile.y_coordinate_in_grid + y)
+                            # avoid auto selecting with the and
+                            if self.__getitem__(tile_xy).pheromone > max_ph and tile_xy != (
+                                    tile.x_coordinate_in_grid, tile.y_coordinate_in_grid):
+                                max_ph = self.__getitem__(tile_xy).pheromone
+                                preferred = tile_xy
 
-                if randint(64, 193) >= (
-                        (
-                                tile.temperature + tile.resources + tile.humidity) // 3 + 10 * tile.grasshoppers_p) and tile.grasshoppers_p > 0:
-                    tile.grasshoppers_p -= 1
-                if randint(64, 193) >= (
-                        (tile.temperature + tile.resources + tile.humidity) // 3) and tile.grasshoppers_NOT_p > 0:
-                    tile.grasshoppers_NOT_p -= 1
-
-                if tile.grasshoppers_p > 0 and tile.pheromone < 1.0:
-                    if max_ph == 0.0:
-                        preferred = (tile.x_coordinate_in_grid + randint(x_min_left, x_min_right - 1),
-                                     tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot - 1))
-                        self.__getitem__(preferred).grasshoppers_p += 1
+                    if randint(64, 129) >= (
+                            (tile.temperature + tile.resources + tile.humidity) // 3 + 5 * (tile.grasshoppers_p + tile.grasshoppers_NOT_p)) and tile.grasshoppers_p > 0:
                         tile.grasshoppers_p -= 1
-                    elif preferred != (-1, -1):  # and max_ph / 3 * 2 > random()
-                        self.__getitem__(preferred).grasshoppers_p += tile.grasshoppers_p
-                        tile.grasshoppers_p = 0
+                    if randint(64, 129) >= (
+                            (tile.temperature + tile.resources + tile.humidity) // 3 + 5 * (tile.grasshoppers_p + tile.grasshoppers_NOT_p)) and tile.grasshoppers_NOT_p > 0:
+                        tile.grasshoppers_NOT_p -= 1
 
-                if tile.grasshoppers_NOT_p > 0:
-                    preferred = (tile.x_coordinate_in_grid + randint(x_min_left, x_min_right - 1),
-                                 tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot - 1))
-                    self.__getitem__(preferred).grasshoppers_NOT_p += 1
-                    tile.grasshoppers_NOT_p -= 1
+                    if tile.grasshoppers_p > 0 and tile.pheromone < 1.0:
+                        if max_ph == 0.0:
+                            for e in range(tile.grasshoppers_p):
+                                p_preferred = (tile.x_coordinate_in_grid + randint(x_min_left, x_min_right),
+                                             tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot))
+                                tile.grasshoppers_p -= 1
+                                self.__getitem__(p_preferred).grasshoppers_p += 1
+                        elif preferred != (-1, -1):  # and max_ph / 3 * 2 > random()
+                            self.__getitem__(preferred).grasshoppers_p += tile.grasshoppers_p
+                            tile.grasshoppers_p = 0
+
+                    if tile.grasshoppers_NOT_p > 0:
+                        for e in range(tile.grasshoppers_NOT_p):
+                            preferred = (tile.x_coordinate_in_grid + randint(x_min_left, x_min_right),
+                                         tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot))
+                            self.__getitem__(preferred).grasshoppers_NOT_p += 1
+                            tile.grasshoppers_NOT_p -= 1
 
     def update(self):
         """
@@ -168,9 +173,11 @@ class Grid:
         """
         tot_grasshoppers_p = 0
         tot_grasshoppers_NOT_p = 0
-        for tile in self:
-            tile.update()
-            tot_grasshoppers_p += tile.grasshoppers_p
-            tot_grasshoppers_NOT_p += tile.grasshoppers_NOT_p
+        for x in range(self.x_number_of_tiles):
+            for y in range(self.y_number_of_tiles):
+                tile = self.__getitem__((x, y))
+                tile.update()
+                tot_grasshoppers_p += tile.grasshoppers_p
+                tot_grasshoppers_NOT_p += tile.grasshoppers_NOT_p
         print(tot_grasshoppers_p, tot_grasshoppers_NOT_p)
         self._move_grasshoppers()
