@@ -13,8 +13,11 @@ class Tile:
         self.y_coordinate_in_grid = y_coordinate_in_grid
 
         self.pheromone = 0.0
-        self.grasshoppers_p = abs(randint(-2, 2))
-        self.grasshoppers_NOT_p = abs(randint(-2, 2))
+        self.grasshoppers_p = abs(randint(
+            SimulationParameters.MIN_GRASSHOPPERS_PER_CELL, SimulationParameters.MAX_GRASSHOPPERS_PER_CELL))
+        self.grasshoppers_NOT_p = abs(randint(
+            SimulationParameters.MIN_GRASSHOPPERS_PER_CELL, SimulationParameters.MAX_GRASSHOPPERS_PER_CELL))
+
         self.temperature = gauss_to_color(192, 64)
         self.resources = gauss_to_color(192, 64)
         self.humidity = gauss_to_color(192, 64)
@@ -40,7 +43,8 @@ class Tile:
             self.temperature += randint(-t_change, t_change)
 
     def _update_resources(self):
-        self.resources = max(0, self.resources - ceil((self.grasshoppers_p + self.grasshoppers_NOT_p) / 5))
+        self.resources = max(
+            0, self.resources - ceil((self.grasshoppers_p + self.grasshoppers_NOT_p) / 5))
         if random() > 2/3:
             self.resources = min(255, self.resources + 1)
 
@@ -138,7 +142,8 @@ class Grid:
                     max_ph = 0.0
                     for x in range(x_min_left, x_min_right + 1):
                         for y in range(y_min_top, y_min_bot + 1):
-                            tile_xy = (tile.x_coordinate_in_grid + x, tile.y_coordinate_in_grid + y)
+                            tile_xy = (tile.x_coordinate_in_grid + x,
+                                       tile.y_coordinate_in_grid + y)
                             # avoid auto selecting with the and
                             if self.__getitem__(tile_xy).pheromone > max_ph and tile_xy != (
                                     tile.x_coordinate_in_grid, tile.y_coordinate_in_grid):
@@ -156,11 +161,13 @@ class Grid:
                         if max_ph == 0.0:
                             for e in range(tile.grasshoppers_p):
                                 p_preferred = (tile.x_coordinate_in_grid + randint(x_min_left, x_min_right),
-                                             tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot))
+                                               tile.y_coordinate_in_grid + randint(y_min_top, y_min_bot))
                                 tile.grasshoppers_p -= 1
-                                self.__getitem__(p_preferred).grasshoppers_p += 1
+                                self.__getitem__(
+                                    p_preferred).grasshoppers_p += 1
                         elif preferred != (-1, -1):  # and max_ph / 3 * 2 > random()
-                            self.__getitem__(preferred).grasshoppers_p += tile.grasshoppers_p
+                            self.__getitem__(
+                                preferred).grasshoppers_p += tile.grasshoppers_p
                             tile.grasshoppers_p = 0
 
                     if tile.grasshoppers_NOT_p > 0:

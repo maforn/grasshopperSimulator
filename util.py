@@ -6,6 +6,7 @@ from random import gauss
 
 import pygame
 
+
 def check_user_exit():
     """
     Quits pygame if the user closes the window
@@ -15,9 +16,10 @@ def check_user_exit():
             pygame.quit()
             sys.exit()
 
+
 def gauss_to_color(mu, sigma):
     """
-    Gaussian curve with mean 128 and standard deviation 64
+    Gaussian curve with mean 128 and standard deviation 64.
+    This is useful because RGB colors are in the range 0-255.
     """
     return min(255, max(0, int(gauss(mu, sigma))))
-
